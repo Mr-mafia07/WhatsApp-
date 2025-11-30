@@ -1,0 +1,1454 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>User Dashboard - WhatsApp Server</title>
+
+  <!-- Fonts + Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    :root{
+      --bg:#f6f8fb;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --accent:#0b69ff;
+      --accent-2:#06b6d4;
+      --success:#0f9840;
+      --danger:#d73a49;
+      --warning:#f59e0b;
+      --soft-border:#e6e9ee;
+      --mono: "Courier New", monospace;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0;}
+    
+    body{
+      min-height:100vh;
+      font-family:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color:#0f172a;
+      padding:20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Header Card */
+    .header-card {
+      width:100%;
+      background:var(--card);
+      border-radius:15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      padding:25px;
+      margin-bottom:25px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .header-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #25D366 0%, #128C7E 100%);
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .fsa {
+      width:80px; 
+      height:80px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:20px;
+      background: linear-gradient(135deg,#25D366,#128C7E);
+      box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3);
+      transition: transform .3s ease;
+    }
+    .fsa:hover{ 
+      transform: rotate(-10deg) scale(1.05); 
+    }
+
+    .fsa i {
+      font-size: 45px;
+      color: white;
+    }
+
+    .header-info h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 5px;
+    }
+
+    .header-info .subtitle {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .user-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 6px 15px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-left: 10px;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    .header-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    /* Stats Cards */
+    .stats-container {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #0089FF 0%, #0066d9 100%);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 12px;
+      min-width: 140px;
+      box-shadow: 0 4px 15px rgba(0, 137, 255, 0.3);
+      transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      display: block;
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      opacity: 0.9;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .stat-icon {
+      font-size: 18px;
+      margin-right: 5px;
+    }
+
+    /* Main Grid Layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 25px;
+      margin-bottom: 25px;
+    }
+
+    /* Card styles */
+    .card {
+      background: var(--card);
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      padding: 25px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 3px solid var(--accent);
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .refresh-btn-small {
+      background: transparent;
+      border: 2px solid var(--soft-border);
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .refresh-btn-small:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: rotate(180deg);
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+
+    .btn {
+      padding: 16px 20px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .btn:active { 
+      transform: translateY(2px); 
+    }
+
+    .btn.primary { 
+      background: linear-gradient(135deg,#0089FF,#0066d9); 
+      color: white;
+    }
+    
+    .btn.primary:hover {
+      box-shadow: 0 6px 20px rgba(0, 137, 255, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .btn.danger { 
+      background: linear-gradient(135deg,#ff6b6b,#d73a49); 
+      color: white;
+    }
+
+    .btn.danger:hover {
+      box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .btn.info { 
+      background: linear-gradient(135deg,#06b6d4,#04899a); 
+      color: white;
+    }
+
+    .btn.info:hover {
+      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .btn.cancel {
+      background: white;
+      color: #394b66;
+      border: 2px solid var(--soft-border);
+      box-shadow: none;
+      padding: 12px 20px;
+    }
+
+    .btn.cancel:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .btn.secondary {
+      background: linear-gradient(135deg, #6b7280, #4b5563);
+      color: white;
+    }
+
+    .btn.secondary:hover {
+      box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4);
+      transform: translateY(-2px);
+    }
+
+    /* Sessions List */
+    .sessions-container {
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .session-item {
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      border-left: 5px solid var(--accent);
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .session-item:hover {
+      transform: translateX(5px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    .session-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .session-id {
+      font-family: var(--mono);
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 14px;
+      background: rgba(11, 105, 255, 0.1);
+      padding: 5px 12px;
+      border-radius: 6px;
+    }
+
+    .session-status {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-running {
+      background: linear-gradient(135deg, #0f9840 0%, #0d8038 100%);
+      color: white;
+      box-shadow: 0 2px 10px rgba(15, 152, 64, 0.3);
+    }
+
+    .status-stopped {
+      background: linear-gradient(135deg, #ff6b6b 0%, #d73a49 100%);
+      color: white;
+      box-shadow: 0 2px 10px rgba(220, 53, 69, 0.3);
+    }
+
+    .session-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 15px;
+      font-size: 13px;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+    }
+
+    .info-item i {
+      color: var(--accent);
+      width: 18px;
+    }
+
+    /* Error Statistics */
+    .error-stats {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      border: 2px solid var(--soft-border);
+    }
+
+    .error-stats-title {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .error-badges {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .error-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .badge-success {
+      background: rgba(15, 152, 64, 0.1);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .badge-warning {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+      border: 1px solid var(--warning);
+    }
+
+    .badge-danger {
+      background: rgba(220, 53, 69, 0.1);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
+    /* Session Actions */
+    .session-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-sm {
+      padding: 10px 16px;
+      font-size: 13px;
+      border-radius: 8px;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+
+    .empty-icon {
+      font-size: 60px;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+
+    .empty-state h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+      color: #0f172a;
+    }
+
+    /* Modal styles */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(12,18,28,0.7);
+      backdrop-filter: blur(5px);
+      z-index: 1200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s ease;
+    }
+    
+    .modal-backdrop.show { 
+      opacity: 1; 
+      pointer-events: auto; 
+    }
+
+    .modal {
+      width: 96%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+      padding: 30px;
+      transform: translateY(30px) scale(.95);
+      transition: transform .3s cubic-bezier(.2,.9,.33,1), opacity .3s ease;
+      opacity: 0;
+    }
+    
+    .modal-backdrop.show .modal { 
+      transform: translateY(0) scale(1); 
+      opacity: 1; 
+    }
+
+    .modal-header {
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--soft-border);
+    }
+
+    .modal-title { 
+      font-weight: 700; 
+      font-size: 22px;
+      color: #0f172a; 
+    }
+
+    .close { 
+      cursor: pointer; 
+      background: transparent; 
+      border: none; 
+      font-size: 32px; 
+      color: var(--muted);
+      transition: all 0.3s;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .close:hover {
+      color: var(--danger);
+      background: rgba(220, 53, 69, 0.1);
+      transform: rotate(90deg);
+    }
+
+    /* Form styles */
+    .form-grid { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 15px; 
+      margin-top: 15px; 
+    }
+
+    .form-row { 
+      text-align: left; 
+    }
+
+    label { 
+      display: block; 
+      font-size: 13px; 
+      color: #394b66; 
+      margin-bottom: 8px; 
+      font-weight: 600; 
+    }
+
+    input[type="text"], 
+    input[type="number"], 
+    select, 
+    input[type="file"] {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 10px;
+      border: 2px solid var(--soft-border);
+      background: #fff;
+      font-size: 14px;
+      color: #07205a;
+      transition: all 0.3s;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(11, 105, 255, 0.1);
+    }
+
+    input[type="file"] { 
+      padding: 12px; 
+    }
+
+    .form-actions { 
+      display: flex; 
+      gap: 12px; 
+      justify-content: flex-end; 
+      margin-top: 20px; 
+    }
+
+    /* Console/Logs */
+    .console {
+      text-align: left;
+      margin-top: 20px;
+      border-radius: 12px;
+      border: 2px solid var(--soft-border);
+      padding: 20px;
+      max-height: 500px;
+      overflow: auto;
+      background: #0f172a;
+      font-family: var(--mono);
+      color: #00ff00;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .console-line {
+      padding: 8px 10px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-family: var(--mono);
+      font-size: 13px;
+      display: block;
+      word-break: break-word;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+
+    .log-success {
+      color: #00ff00;
+      background: rgba(0, 255, 0, 0.05);
+    }
+
+    .log-error {
+      color: #ff4444;
+      background: rgba(255, 68, 68, 0.05);
+    }
+
+    .log-info {
+      color: #44aaff;
+      background: rgba(68, 170, 255, 0.05);
+    }
+
+    .log-warning {
+      color: #ffaa00;
+      background: rgba(255, 170, 0, 0.05);
+    }
+
+    .muted { 
+      color: var(--muted); 
+      font-size: 13px; 
+    }
+
+    .big { 
+      font-size: 18px; 
+      font-weight: 700; 
+      color: #07205a; 
+      display: block; 
+      margin-bottom: 6px; 
+    }
+
+    .alert {
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+    }
+
+    .alert-success {
+      background: rgba(15, 152, 64, 0.1);
+      color: var(--success);
+      border: 2px solid var(--success);
+    }
+
+    .alert-error {
+      background: rgba(220, 53, 69, 0.1);
+      color: var(--danger);
+      border: 2px solid var(--danger);
+    }
+
+    .alert-info {
+      background: rgba(6, 182, 212, 0.1);
+      color: var(--accent-2);
+      border: 2px solid var(--accent-2);
+    }
+
+    /* Info boxes */
+    .info-box {
+      margin-top: 15px;
+      padding: 15px;
+      background: #fff7ed;
+      border: 2px solid #f6d365;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .info-box strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #0f172a;
+    }
+
+    .info-box ul {
+      margin-left: 20px;
+      margin-top: 8px;
+    }
+
+    .info-box li {
+      margin-bottom: 5px;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--soft-border);
+      border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #0066d9;
+    }
+
+    /* Responsive */
+    @media (max-width: 1000px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .form-grid { 
+        grid-template-columns: 1fr; 
+      }
+      
+      .header-content {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .stats-container {
+        justify-content: center;
+      }
+
+      .action-buttons {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .session-item {
+      animation: fadeIn 0.3s ease;
+    }
+
+    /* Loading spinner */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header-card">
+      <div class="header-content">
+        <div class="header-left">
+          <div class="fsa" title="WhatsApp Enhanced Server">
+            <i class="fab fa-whatsapp"></i>
+          </div>
+          <div class="header-info">
+            <h1>
+              My Dashboard
+              <span class="user-badge" id="userBadge">👤 User</span>
+            </h1>
+            <div class="subtitle">📊 Manage your WhatsApp Sessions</div>
+          </div>
+        </div>
+        <div class="header-right">
+          <button class="btn secondary btn-sm" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px;">
+        <div class="stats-container">
+          <div class="stat-card">
+            <span class="stat-value" id="uptimeValue">-</span>
+            <span class="stat-label"><i class="fas fa-clock stat-icon"></i>Uptime</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="sessionsCount">0</span>
+            <span class="stat-label"><i class="fas fa-server stat-icon"></i>My Sessions</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div class="dashboard-grid">
+      <!-- Left Column: Actions -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="fas fa-cog"></i>
+            Actions
+          </div>
+        </div>
+        <div class="action-buttons">
+          <button class="btn primary" id="openStart">
+            <i class="fas fa-play-circle"></i>
+            <span>Start New Session</span>
+          </button>
+          <button class="btn danger" id="openStop">
+            <i class="fas fa-stop-circle"></i>
+            <span>Stop Session</span>
+          </button>
+          <button class="btn info" id="openConsole">
+            <i class="fas fa-terminal"></i>
+            <span>View Console Logs</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Column: Active Sessions -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="fas fa-list"></i>
+            My Active Sessions
+          </div>
+          <button class="refresh-btn-small" onclick="loadSessions()" title="Refresh Sessions">
+            <i class="fas fa-sync-alt"></i>
+          </button>
+        </div>
+        <div class="sessions-container" id="sessionsList">
+          <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <h3>No Active Sessions</h3>
+            <p class="muted">You have not created a session yet</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- START Modal -->
+  <div id="startModal" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">🚀 Start New Session</div>
+          <div class="muted">Configure and start an automated WhatsApp session</div>
+        </div>
+        <button class="close" id="closeStart">&times;</button>
+      </div>
+
+      <form id="startForm" enctype="multipart/form-data">
+        <div class="form-grid">
+          <div class="form-row">
+            <label><i class="fas fa-user"></i> Bot Name / Prefix</label>
+            <input type="text" name="name" placeholder="MyBot" required />
+          </div>
+
+          <div class="form-row">
+            <label><i class="fas fa-filter"></i> Target Type</label>
+            <select name="type" required>
+              <option value="">Select Type</option>
+              <option value="contacts">📞 Contacts</option>
+              <option value="gc">👥 Group Chat</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label><i class="fas fa-hashtag"></i> Target ID / Numbers</label>
+            <input type="text" name="targetID" placeholder="919876543210 or group@g.us" required />
+          </div>
+
+          <div class="form-row">
+            <label><i class="fas fa-clock"></i> Delay (seconds)</label>
+            <input type="number" name="delayTime" min="1" value="5" required/>
+          </div>
+
+          <div class="form-row">
+            <label><i class="fas fa-file-code"></i> creds.json</label>
+            <input type="file" name="creds" accept=".json" required/>
+          </div>
+
+          <div class="form-row">
+            <label><i class="fas fa-file-alt"></i> message.txt</label>
+            <input type="file" name="messageFile" accept=".txt" required/>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn cancel" type="button" id="startCancel">Cancel</button>
+          <button class="btn primary" type="submit">
+            <i class="fas fa-rocket"></i> Start Session
+          </button>
+        </div>
+
+        <div id="startResult"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- STOP Modal -->
+  <div id="stopModal" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">🛑 Stop Session</div>
+          <div class="muted">Stop the session and do complete cleanup</div>
+        </div>
+        <button class="close" id="closeStop">&times;</button>
+      </div>
+
+      <div>
+        <label><i class="fas fa-hashtag"></i> Session ID</label>
+        <input id="stopIdInput" type="text" placeholder="sess_abc123xyz" />
+        
+        <div class="info-box">
+          <strong>🧹 Complete Cleanup Process:</strong>
+          <ul>
+            <li>✓ Socket connections will be closed</li>
+            <li>✓ All watchers and timers will stop</li>
+            <li>✓ all files will be deleted</li>
+            <li>✓ all memory references will be cleared</li>
+          </ul>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn cancel" id="stopCancel">Cancel</button>
+          <button class="btn danger" id="stopConfirm">
+            <i class="fas fa-trash-alt"></i> Stop & Cleanup
+          </button>
+        </div>
+        
+        <div id="stopResult"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONSOLE Modal -->
+  <div id="consoleModal" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">📋 Console Logs</div>
+          <div class="muted">View real-time session logs and error statistics</div>
+        </div>
+        <button class="close" id="closeConsole">&times;</button>
+      </div>
+
+      <div>
+        <label><i class="fas fa-hashtag"></i> Session ID</label>
+        <input id="consoleSessionId" type="text" placeholder="Enter Session ID" />
+        
+        <div class="form-actions">
+          <button class="btn cancel" id="consoleCancel">Close</button>
+          <button class="btn info" id="consoleLoad">
+            <i class="fas fa-download"></i> Load Logs
+          </button>
+        </div>
+
+        <div id="errorStatsDisplay"></div>
+        <div id="consoleArea" class="console">
+          <div class="muted">Enter the Session ID and click on "Load Logs".</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check authentication
+    let currentUser = null;
+
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/verify');
+        if (!response.ok) {
+          window.location.href = '/index.html';
+          return;
+        }
+        const data = await response.json();
+        if (data.ok) {
+          currentUser = data.user;
+          document.getElementById('userBadge').textContent = '👤 ' + currentUser.username;
+          
+          // If admin, redirect to admin panel
+          if (currentUser.role === 'admin') {
+            window.location.href = '/admin.html';
+            return;
+          }
+        } else {
+          window.location.href = '/index.html';
+        }
+      } catch (e) {
+        window.location.href = '/index.html';
+      }
+    }
+
+    // Logout function
+    async function logout() {
+      try {
+        await fetch('/api/logout', { method: 'POST' });
+        window.location.href = '/index.html';
+      } catch (e) {
+        alert('Logout failed');
+      }
+    }
+
+    // DOM Elements
+    const openStart = document.getElementById('openStart');
+    const openStop = document.getElementById('openStop');
+    const openConsole = document.getElementById('openConsole');
+
+    const startModal = document.getElementById('startModal');
+    const stopModal = document.getElementById('stopModal');
+    const consoleModal = document.getElementById('consoleModal');
+
+    const closeStart = document.getElementById('closeStart');
+    const closeStop = document.getElementById('closeStop');
+    const closeConsole = document.getElementById('closeConsole');
+
+    const startCancel = document.getElementById('startCancel');
+    const stopCancel = document.getElementById('stopCancel');
+    const consoleCancel = document.getElementById('consoleCancel');
+
+    const startForm = document.getElementById('startForm');
+    const startResult = document.getElementById('startResult');
+
+    const stopConfirm = document.getElementById('stopConfirm');
+    const stopIdInput = document.getElementById('stopIdInput');
+    const stopResult = document.getElementById('stopResult');
+
+    const consoleLoad = document.getElementById('consoleLoad');
+    const consoleArea = document.getElementById('consoleArea');
+    const consoleSessionId = document.getElementById('consoleSessionId');
+    const errorStatsDisplay = document.getElementById('errorStatsDisplay');
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      checkAuth();
+      loadSessions();
+      loadUptime();
+      
+      // Auto-refresh every 5 seconds
+      setInterval(loadSessions, 5000);
+      setInterval(loadUptime, 10000);
+    });
+
+    // Modal Functions
+    function showModal(modal) {
+      if (!modal) return;
+      modal.classList.add('show');
+      setTimeout(() => {
+        const input = modal.querySelector('input[type="text"], input[type="number"], select');
+        if (input) input.focus();
+      }, 100);
+    }
+
+    function hideModal(modal) {
+      if (!modal) return;
+      modal.classList.remove('show');
+    }
+
+    // Open Modals
+    openStart.addEventListener('click', () => showModal(startModal));
+    openStop.addEventListener('click', () => {
+      showModal(stopModal);
+      const last = localStorage.getItem('lastSession');
+      if (last) stopIdInput.value = last;
+    });
+    openConsole.addEventListener('click', () => {
+      showModal(consoleModal);
+      const last = localStorage.getItem('lastSession');
+      if (last) consoleSessionId.value = last;
+    });
+
+    // Close Modals
+    closeStart.addEventListener('click', () => hideModal(startModal));
+    closeStop.addEventListener('click', () => hideModal(stopModal));
+    closeConsole.addEventListener('click', () => hideModal(consoleModal));
+
+    startCancel.addEventListener('click', () => hideModal(startModal));
+    stopCancel.addEventListener('click', () => hideModal(stopModal));
+    consoleCancel.addEventListener('click', () => hideModal(consoleModal));
+
+    // Close on outside click
+    [startModal, stopModal, consoleModal].forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) hideModal(modal);
+      });
+    });
+
+    // Load Sessions
+    async function loadSessions() {
+      try {
+        const response = await fetch('/sessions');
+        const data = await response.json();
+
+        if (data.ok) {
+          document.getElementById('sessionsCount').textContent = data.count || 0;
+          displaySessions(data.sessions || []);
+        }
+      } catch (error) {
+        console.error('Error loading sessions:', error);
+      }
+    }
+
+    // Display Sessions
+    function displaySessions(sessions) {
+      const container = document.getElementById('sessionsList');
+
+      if (!sessions || sessions.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <h3>No Active Sessions</h3>
+            <p class="muted">You have not created a session yet</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = sessions.map(session => {
+        const isRunning = session.runningLoop;
+        const errorStats = session.errorStats || {};
+        const hasBadMac = errorStats.badMacErrors > 0;
+        const hasSendErrors = errorStats.consecutiveSendErrors > 0;
+        const hasReconnects = errorStats.reconnectAttempts > 0;
+
+        return `
+          <div class="session-item">
+            <div class="session-header">
+              <span class="session-id">${session.sessionId}</span>
+              <span class="session-status ${isRunning ? 'status-running' : 'status-stopped'}">
+                ${isRunning ? '🟢 Running' : '🔴 Stopped'}
+              </span>
+            </div>
+
+            <div class="session-info">
+              <div class="info-item">
+                <i class="fas fa-bullseye"></i>
+                <span><strong>Target:</strong> ${session.target === 'gc' ? 'Group Chat' : 'Contacts'}</span>
+              </div>
+              ${session.groupId ? `
+              <div class="info-item">
+                <i class="fas fa-users"></i>
+                <span><strong>Group:</strong> ${session.groupId}</span>
+              </div>
+              ` : ''}
+              <div class="info-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span><strong>Created:</strong> ${new Date(session.createdAt).toLocaleString()}</span>
+              </div>
+              ${session.lastUsed ? `
+              <div class="info-item">
+                <i class="fas fa-clock"></i>
+                <span><strong>Last Used:</strong> ${new Date(session.lastUsed).toLocaleString()}</span>
+              </div>
+              ` : ''}
+            </div>
+
+            ${errorStats ? `
+            <div class="error-stats">
+              <div class="error-stats-title">📊 Error Statistics</div>
+              <div class="error-badges">
+                <span class="error-badge ${hasBadMac ? 'badge-danger' : 'badge-success'}">
+                  ${hasBadMac ? '🔴' : '✓'} Bad MAC: ${errorStats.badMacErrors || 0}
+                </span>
+                <span class="error-badge ${hasSendErrors ? 'badge-warning' : 'badge-success'}">
+                  ${hasSendErrors ? '⚠️' : '✓'} Send Errors: ${errorStats.consecutiveSendErrors || 0}
+                </span>
+                <span class="error-badge ${hasReconnects ? 'badge-warning' : 'badge-success'}">
+                  ${hasReconnects ? '⚠️' : '✓'} Reconnects: ${errorStats.reconnectAttempts || 0}
+                </span>
+                <span class="error-badge badge-success">
+                  📈 Total: ${errorStats.totalErrors || 0}
+                </span>
+              </div>
+            </div>
+            ` : ''}
+
+            <div class="session-actions">
+              <button class="btn info btn-sm" onclick="viewLogs('${session.sessionId}')">
+                <i class="fas fa-file-alt"></i> View Logs
+              </button>
+              <button class="btn danger btn-sm" onclick="stopSession('${session.sessionId}')">
+                <i class="fas fa-stop"></i> Stop
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Load Uptime
+    async function loadUptime() {
+      try {
+        const response = await fetch('/api/uptime');
+        const data = await response.json();
+
+        if (data.ok && data.uptimeFormatted) {
+          document.getElementById('uptimeValue').textContent = formatUptime(data.uptimeMs);
+        }
+      } catch (error) {
+        console.error('Error loading uptime:', error);
+        document.getElementById('uptimeValue').textContent = 'N/A';
+      }
+    }
+
+    // Format uptime
+    function formatUptime(ms) {
+      const seconds = Math.floor(ms / 1000);
+      const days = Math.floor(seconds / 86400);
+      const hours = Math.floor((seconds % 86400) / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+
+      if (days > 0) return `${days}d ${hours}h`;
+      if (hours > 0) return `${hours}h ${minutes}m`;
+      return `${minutes}m`;
+    }
+
+    // Start Session
+    startForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      startResult.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Creating session...</div>';
+      
+      const formData = new FormData(startForm);
+
+      try {
+        const response = await fetch('/send-message', {
+          method: 'POST',
+          body: formData
+        });
+
+        const contentType = response.headers.get('content-type') || '';
+
+        if (contentType.includes('application/json')) {
+          const data = await response.json();
+          if (data.ok && data.sessionId) {
+            startResult.innerHTML = `
+              <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <div>
+                  <div class="big">Session Started!</div>
+                  <div class="muted">ID: ${data.sessionId}</div>
+                </div>
+              </div>
+            `;
+            localStorage.setItem('lastSession', data.sessionId);
+            setTimeout(() => {
+              hideModal(startModal);
+              startForm.reset();
+              startResult.innerHTML = '';
+              loadSessions();
+            }, 2000);
+          } else {
+            startResult.innerHTML = `<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ${data.error || 'Failed to create session'}</div>`;
+          }
+        } else {
+          const text = await response.text();
+          startResult.innerHTML = `<div class="alert alert-error"><i class="fas fa-exclamation-triangle"></i> ${text}</div>`;
+        }
+      } catch (error) {
+        startResult.innerHTML = `<div class="alert alert-error"><i class="fas fa-times-circle"></i> Error: ${error.message}</div>`;
+      }
+    });
+
+    // Stop Session
+    async function stopSession(sessionId) {
+      if (!confirm(`Session ${sessionId} stop?\n\nThere will be complete cleanup:\n✓ Connections will be closed\n✓ Watchers will stop\n✓ Files will be deleted\n✓ Memory will be clear`)) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/stop-session/${sessionId}`, {
+          method: 'POST'
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.ok) {
+          loadSessions();
+          alert(`✓ Session ${sessionId} successfully stopped!`);
+        } else {
+          alert(`✗ Failed to stop session: ${data.error || 'Unknown error'}`);
+        }
+      } catch (error) {
+        alert(`✗ Error: ${error.message}`);
+      }
+    }
+
+    stopConfirm.addEventListener('click', async () => {
+      const id = stopIdInput.value.trim();
+      if (!id) {
+        stopResult.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Session ID डालें</div>';
+        return;
+      }
+
+      stopResult.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Stopping session...</div>';
+
+      try {
+        const response = await fetch(`/stop-session/${id}`, {
+          method: 'POST'
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.ok) {
+          stopResult.innerHTML = `
+            <div class="alert alert-success">
+              <i class="fas fa-check-circle"></i>
+              <div>
+                <div class="big">Session Stopped!</div>
+                <div class="muted">${data.message || 'Complete cleanup performed'}</div>
+              </div>
+            </div>
+          `;
+          if (localStorage.getItem('lastSession') === id) {
+            localStorage.removeItem('lastSession');
+          }
+          setTimeout(() => {
+            hideModal(stopModal);
+            stopResult.innerHTML = '';
+            stopIdInput.value = '';
+            loadSessions();
+          }, 2000);
+        } else {
+          stopResult.innerHTML = `<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ${data.error || 'Failed to stop session'}</div>`;
+        }
+      } catch (error) {
+        stopResult.innerHTML = `<div class="alert alert-error"><i class="fas fa-times-circle"></i> Error: ${error.message}</div>`;
+      }
+    });
+
+    // View Logs
+    async function viewLogs(sessionId) {
+      consoleSessionId.value = sessionId;
+      showModal(consoleModal);
+      await loadLogs();
+    }
+
+    // Load Logs
+    async function loadLogs() {
+      const id = consoleSessionId.value.trim();
+      if (!id) {
+        consoleArea.innerHTML = '<div class="muted">Enter Session ID and click on "Load Logs"</div>';
+        return;
+      }
+
+      consoleArea.innerHTML = '<div class="log-info">Loading logs...</div>';
+      errorStatsDisplay.innerHTML = '';
+
+      try {
+        const response = await fetch(`/api/logs/${id}`);
+        const data = await response.json();
+
+        if (data.ok) {
+          if (data.logs && data.logs.length > 0) {
+            consoleArea.innerHTML = data.logs.map(log => {
+              let className = 'log-info';
+              if (log.includes('✓') || log.includes('success')) className = 'log-success';
+              else if (log.includes('✗') || log.includes('error') || log.includes('failed')) className = 'log-error';
+              else if (log.includes('⚠️') || log.includes('warning')) className = 'log-warning';
+              
+              return `<div class="console-line ${className}">${escapeHtml(log)}</div>`;
+            }).join('');
+
+            consoleArea.scrollTop = consoleArea.scrollHeight;
+          } else {
+            consoleArea.innerHTML = '<div class="log-info">There are no logs yet.</div>';
+          }
+
+          // Display error stats
+          if (data.errorStats) {
+            const stats = data.errorStats;
+            errorStatsDisplay.innerHTML = `
+              <div class="error-stats" style="margin-top: 15px;">
+                <div class="error-stats-title">📊 Error Statistics for ${id}</div>
+                <div class="error-badges">
+                  <span class="error-badge ${stats.badMacErrors > 0 ? 'badge-danger' : 'badge-success'}">
+                    Bad MAC: ${stats.badMacErrors || 0}
+                  </span>
+                  <span class="error-badge ${stats.consecutiveSendErrors > 0 ? 'badge-warning' : 'badge-success'}">
+                    Send Errors: ${stats.consecutiveSendErrors || 0}
+                  </span>
+                  <span class="error-badge ${stats.reconnectAttempts > 0 ? 'badge-warning' : 'badge-success'}">
+                    Reconnects: ${stats.reconnectAttempts || 0}
+                  </span>
+                  <span class="error-badge badge-success">
+                    Total: ${stats.totalErrors || 0}
+                  </span>
+                </div>
+              </div>
+            `;
+          }
+        } else {
+          consoleArea.innerHTML = `<div class="log-error">Error: ${data.error || 'Failed to load logs'}</div>`;
+        }
+      } catch (error) {
+        consoleArea.innerHTML = `<div class="log-error">Error: ${error.message}</div>`;
+      }
+    }
+
+    consoleLoad.addEventListener('click', loadLogs);
+
+    // Keyboard shortcuts
+    consoleSessionId.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        consoleLoad.click();
+        e.preventDefault();
+      }
+    });
+
+    stopIdInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        stopConfirm.click();
+        e.preventDefault();
+      }
+    });
+
+    // Escape HTML
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

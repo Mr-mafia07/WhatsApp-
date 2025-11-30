@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Admin Panel · WhatsApp Server</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    body {
+      background: linear-gradient(120deg,#886cfa 0%,#50c9fa 100%);
+      font-family: 'Poppins',Arial,sans-serif;
+      margin:0; padding:0;
+      min-height: 100vh;
+      color:#1b2340;
+    }
+    .container {
+      max-width: 510px;
+      margin: 0 auto;
+      padding: 15px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .header-card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow:0 8px 36px #a29efb2a;
+      padding:25px 18px 20px 18px;
+      display:flex; flex-direction: column; align-items:center;
+    }
+    .stats-row{
+      display:flex; gap:19px; margin-top:10px;
+      justify-content:center; flex-wrap: wrap;
+    }
+    .stat-block{
+      background:linear-gradient(135deg,#e4f6fa,#f8f7ff 75%);
+      border-radius:14px; box-shadow:0 3px 12px #c1d2fc36;
+      padding:14px 18px; min-width:98px; text-align:center;
+    }
+    .stat-title{font-size:1rem;color:#383afc;font-weight:600;}
+    .stat-label{font-size:13.5px;color:#555;display:flex;align-items:center;gap:4px;}
+    .actions-card{
+      background: #fff;
+      border-radius: 19px;
+      box-shadow:0 8px 25px #81d2fa24;
+      padding:20px 16px 18px 16px;
+      display:flex; flex-direction:column; gap:12px;
+    }
+    .actions-card h2, .sessions-card h2, .users-card h2{
+      font-size:1.25rem;font-weight:700;margin-bottom:10px;color:#332d91;display:flex;align-items:center;gap:8px;
+    }
+    .actions-btn {
+      width:100%; padding:17px 0;font-size:1.04rem;
+      border:none;border-radius:13px;font-weight:700;letter-spacing:.12px;
+      cursor:pointer;box-shadow:0 2px 14px #6bd7fa1e;
+      margin-top:7px;margin-bottom:1px;
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      transition:0.18s;
+    }
+    .actions-btn.start {background:linear-gradient(90deg,#077afc 0%, #20c4fc 100%);color:#fff;}
+    .actions-btn.stop {background:linear-gradient(90deg,#f35353,#f79696 90%);color:#fff;}
+    .sessions-card,.users-card{
+      background:#fff;
+      border-radius:19px;
+      box-shadow:0 8px 28px #b9bbfa1f;
+      padding:18px 13px 12px 13px;
+      margin-bottom:10px;
+    }
+    .session-list {
+      display:flex; flex-direction:column; gap:19px;
+    }
+    .session-card {
+      background: #f7fbff;
+      border-radius:17px;
+      box-shadow:0 6px 22px #a6b5fa34;
+      padding:18px 17px 17px;
+      position:relative;
+      margin-bottom:4px;
+      border: 2.5px solid #338afd20;
+      overflow:hidden;
+    }
+    .session-head {
+      font-family:monospace;font-size:1.05rem;padding:3px 11px;
+      background: #e9f0ff;
+      border-radius:7px;
+      font-weight:600;
+      margin-bottom:9px;
+      color:#338afd;
+      display:inline-block;
+      word-break:break-all;
+    }
+    .session-status {
+      display:flex;align-items:center;gap:7px;
+      margin:7px 0 6px 0;
+    }
+    .status-badge.running{background:#2bd47d;color:#fff;border-radius:25px;padding:8px 19px;font-weight:700;font-size:.98rem;}
+    .status-badge.stopped{background:#e44260;color:#fff;border-radius:25px;padding:8px 19px;font-weight:700;font-size:.98rem;}
+    .session-meta{
+      font-size:15px;color:#353e53;margin-bottom:3px;
+      display:flex;flex-direction:column;gap:4px;
+    }
+    .session-meta b{margin-right:6px;}
+    .error-stats-block{
+      background:#fff;
+      border-radius:12px;
+      box-shadow:0 2px 8px #d0e1fa13;
+      padding:13px 12px; margin-top:9px;
+    }
+    .error-title{
+      font-size:15px;font-weight:700; color:#5d69a8;margin-bottom:7px; display:flex; align-items:center;gap:6px;
+    }
+    .estats-row{
+      display:flex;flex-wrap:wrap;gap:11px;
+      margin-top:2px;margin-bottom:4px;
+    }
+    .estat{
+      display:flex;align-items:center;gap:7px;
+      border-radius:12px;
+      background: #e8fdeb;
+      color:#228b22;font-size:14px;font-weight:600;
+      padding:7px 18px;
+      margin-bottom:5px;
+      margin-right:2px;
+    }
+    .estat.badmac{background:#e8fdeb;color:#228b22}
+    .estat.senderr{background:#fff8e0;color:#b76c00}
+    .estat.reconn{background:#e6fdfa;color:#119afc}
+    .estat.total{background:#fbf4fc;color:#9d36af}
+    .action-btns{
+      display:flex;gap:16px;margin-top:10px;
+    }
+    .action-btns .btn {
+      flex:1;
+      font-size:1.03rem;
+      border:none;border-radius:11px;font-weight:700;
+      cursor:pointer;box-shadow:0 2px 14px #e6f7fa1e;
+      padding:13px 0;
+      margin-right:0;
+    }
+    .btn.view {background:linear-gradient(90deg,#01b4d3 0%, #1e79fa 100%); color:#fff;}
+    .btn.stop {background:linear-gradient(90deg,#f35353,#f79696 90%); color:#fff;}
+    .console-block{
+      background:#fff4f6;
+      border-radius:10px;
+      border:1.5px solid #dee9fa;
+      padding:10px 8px;
+      margin-top:13px;
+      font-size:14.6px;
+      font-family:monospace;
+      max-height:205px;
+      overflow-y:auto;
+      box-shadow:0 2px 9px #e6bdfa12;
+    }
+    .console-block .log-success {color: #079921;}
+    .console-block .log-error {color: #ef1f41;}
+    .console-block .log-warning {color: #d69e08;}
+    .console-block .log-info {color:#1382c2;}
+    .console-block .line {margin-bottom:2px;}
+    @media (max-width:600px){
+      .container{max-width:97vw;}
+      .header-card,.actions-card,.sessions-card,.users-card{padding:9px 3px 10px 7px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Dashboard stats -->
+    <div class="header-card">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width:56px;height:56px;border-radius:13px;box-shadow:0 2px 12px #25d36631;">
+      <h2 style="font-weight:700; margin-top:11px;margin-bottom:2px;">Admin Panel</h2>
+      <div style="font-size:15.5px;color:#556;">WhatsApp Server User/Session Management</div>
+      <div class="stats-row" style="margin-bottom:-6px;">
+        <div class="stat-block">
+          <div class="stat-title" id="uptimeValue">--</div>
+          <div class="stat-label"><i class="fas fa-clock"></i> Uptime</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-title" id="sessionsCount">0</div>
+          <div class="stat-label"><i class="fas fa-server"></i> Sessions</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Card -->
+    <div class="users-card">
+      <h2><i class="fas fa-users"></i> All Users</h2>
+      <div id="users"></div>
+    </div>
+
+    <!-- Actions Card -->
+    <div class="actions-card">
+      <h2><i class="fas fa-cogs"></i> Actions</h2>
+      <button class="actions-btn start" onclick="loadSessions()"><i class="fas fa-sync-alt"></i> REFRESH SESSIONS</button>
+      <!-- You can add more admin actions here -->
+    </div>
+
+    <!-- Sessions Card -->
+    <div class="sessions-card">
+      <h2><i class="fas fa-server"></i> All Sessions</h2>
+      <div class="session-list" id="sessions"></div>
+    </div>
+  </div>
+  <script>
+    // --- UPTIME & COUNT ---
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/uptime');
+        const data = await res.json();
+        if(data.ok) {
+          document.getElementById('uptimeValue').textContent = formatUptime(data.uptimeMs);
+          document.getElementById('sessionsCount').textContent = data.count !== undefined ? data.count : (data.activeSessions||0);
+        }
+      } catch(e){
+        document.getElementById('uptimeValue').textContent = 'N/A'; document.getElementById('sessionsCount').textContent = 'N/A';
+      }
+    }
+    function formatUptime(ms) {
+      const seconds = Math.floor(ms / 1000);
+      const days = Math.floor(seconds / 86400);
+      const hours = Math.floor((seconds % 86400) / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      if (days > 0) return `${days}d ${hours}h`;
+      if (hours > 0) return `${hours}h ${minutes}m`;
+      return `${minutes}m`;
+    }
+
+    // --- CUSTOM DATE FORMAT ---
+    function formatDateFancy(dateStr) {
+      if(!dateStr) return '';
+      const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      const d = new Date(dateStr);
+      if(isNaN(d)) return dateStr;
+      let dd = d.getDate();
+      let mm = months[d.getMonth()];
+      let yyyy = d.getFullYear();
+      let hours = d.getHours(), mins = d.getMinutes();
+      let ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      mins = mins.toString().padStart(2,'0');
+      return `${dd} ${mm} ${yyyy}, ${hours}:${mins} ${ampm}`;
+    }
+
+    // --- USERS ---
+    async function loadUsers() {
+      const container = document.getElementById('users');
+      container.innerHTML = "<span class='muted'>Loading users...</span>";
+      try {
+        const res = await fetch('/api/admin/users');
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error || "Unknown error");
+        if (!data.users.length) {
+          container.innerHTML = "<span class='muted'>No users found.</span>";
+          return;
+        }
+        let html = `<table style="width:100%;border-collapse:collapse;font-size:14.5px"><tr>
+          <th>Username</th><th>Role</th><th>Created At</th></tr>`;
+        for (const u of data.users) {
+          html += `<tr>
+            <td>${u.username}</td>
+            <td><span class="role-badge ${u.role}">${u.role}</span></td>
+            <td>${formatDateFancy(u.createdAt)}</td>
+            </tr>`;
+        }
+        html += "</table>";
+        container.innerHTML = html;
+      } catch(e){
+        container.innerHTML = `<span class="error">Failed to load users: ${e.message || e}</span>`;
+      }
+    }
+
+    // --- SESSIONS ---
+    let openConsole = null;
+    async function loadSessions() {
+      const container = document.getElementById('sessions');
+      container.innerHTML = "<span class='muted'>Loading sessions...</span>";
+      try {
+        const res = await fetch('/sessions');
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error || "Unknown error");
+        document.getElementById('sessionsCount').textContent = data.count !== undefined ? data.count : (data.sessions ? data.sessions.length : 0);
+        if (!data.sessions.length) { container.innerHTML = "<span class='muted'>No active sessions.</span>"; return; }
+        container.innerHTML = data.sessions.map(session => renderSessionCard(session)).join('');
+        if(openConsole) loadLogs(openConsole);
+      } catch(e){
+        container.innerHTML = `<span class="error">Failed to load sessions: ${e.message || e}</span>`;
+      }
+    }
+    function renderSessionCard(s) {
+      const errorStats = s.errorStats || {};
+      // Button ids unique
+      const logBtn = `logbtn_${s.sessionId}`;
+      const stopBtn = `stopbtn_${s.sessionId}`;
+      return `
+        <div class="session-card" id="card_${s.sessionId}">
+          <div class="session-head">${s.sessionId}</div>
+          <div class="session-status">
+            <span class="status-badge ${s.runningLoop?'running':'stopped'}">${s.runningLoop?'RUNNING':'STOPPED'}</span>
+          </div>
+          <div class="session-meta">
+            <div><b>Target:</b> ${s.target==='gc'?'Group Chat':'Contacts'}${s.groupId?` <span style="color:#119afc;">(group ${s.groupId})</span>`:''}</div>
+            <div><i class="fas fa-calendar-alt"></i> <b>Created:</b> ${formatDateFancy(s.createdAt)}</div>
+          </div>
+          <div class="error-stats-block">
+            <div class="error-title"><i class="fas fa-chart-bar"></i> ERROR STATISTICS</div>
+            <div class="estats-row">
+              <div class="estat badmac"><i class="fas fa-check"></i> Bad MAC: ${errorStats.badMacErrors||0}</div>
+              <div class="estat senderr"><i class="fas fa-exclamation-triangle"></i> Send Errors: ${errorStats.consecutiveSendErrors||0}</div>
+              <div class="estat reconn"><i class="fas fa-sync-alt"></i> Reconnects: ${errorStats.reconnectAttempts||0}</div>
+              <div class="estat total"><i class="fas fa-chart-line"></i> Total: ${errorStats.totalErrors||0}</div>
+            </div>
+          </div>
+          <div class="action-btns">
+            <button class="btn view" id="${logBtn}" onclick="showConsole('${s.sessionId}')"><i class="fas fa-file-alt"></i> VIEW LOGS</button>
+            <button class="btn stop" id="${stopBtn}" onclick="stopSession('${s.sessionId}')"><i class="fas fa-stop"></i> STOP</button>
+          </div>
+          <div id="console_${s.sessionId}" style="display:none;"></div>
+        </div>
+      `;
+    }
+    function showConsole(sessionId) {
+      // Hide others, show only the requested one
+      openConsole = sessionId;
+      document.querySelectorAll('[id^="console_"]').forEach(e=>{if(e.id!=="console_"+sessionId)e.style.display="none";});
+      document.getElementById("console_"+sessionId).style.display = '';
+      loadLogs(sessionId);
+    }
+    async function stopSession(sessionId) {
+      let btn = document.getElementById(`stopbtn_${sessionId}`);
+      btn.disabled = true;
+      btn.textContent = "Stopping...";
+      try {
+        const res = await fetch('/stop-session/' + sessionId, { method: 'POST' });
+        const data = await res.json();
+        if (data.ok) {
+          btn.textContent = "Stopped!";
+          setTimeout(() => { loadSessions(); }, 1400);
+        } else {
+          btn.textContent = "FAILED";
+          alert(data.error||"Error");
+          btn.disabled = false;
+          btn.textContent = "STOP";
+        }
+      } catch (e) {
+        btn.textContent = "FAILED";
+        alert(e.message);
+        btn.disabled = false;
+      }
+    }
+    async function loadLogs(sessionId){
+      let block = document.getElementById('console_'+sessionId);
+      if(!block) return;
+      block.innerHTML = '<div class="console-block">Loading logs...</div>';
+      try {
+        const res = await fetch('/api/logs/' + sessionId);
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error || "Unknown error");
+        if (data.logs && data.logs.length) {
+          block.innerHTML = `<div class="console-block">${data.logs.map(l=>{
+            let c='line log-info';
+            if(l.includes('✅'))c='line log-success';
+            if(l.includes('❌')||l.includes('error')||l.includes('failed'))c='line log-error';
+            if(l.includes('⚠️')||l.includes('warning'))c='line log-warning';
+            return `<div class="${c}">${escapeHtml(l)}</div>`;
+          }).join('')}</div>`;
+        } else {
+          block.innerHTML = '<div class="console-block"><span class="muted">No logs available.</span></div>';
+        }
+      } catch(e){
+        block.innerHTML = `<div class="console-block"><span class="error">Error loading logs: ${e.message}</span></div>`;
+      }
+    }
+    function escapeHtml(txt) {
+      const div = document.createElement('div'); div.textContent=txt; return div.innerHTML;
+    }
+
+    loadUsers();
+  loadSessions();
+  loadStats();
+  setInterval(loadSessions,60000);
+  setInterval(loadStats,12000);
+</script>
+</body>
+</html>
